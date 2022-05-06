@@ -11,6 +11,9 @@ struct ContentView: View {
     @State private var scoreTitle = ""
     @State private var showingScore = false
     @State private var score = 0
+    @State private var tappedCountryIndex = 0
+    @State private var completed = false
+    @State private var questionCount = 0
     
     @State private var countries = ["Estonia","France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US" ].shuffled()
     @State private var correctAnswer = Int.random(in: 0...2)
@@ -58,26 +61,56 @@ struct ContentView: View {
             .alert(scoreTitle, isPresented: $showingScore){
                 Button("Continue", action: askQuestion)
             }message: {
-                Text("Your score is \(score)")
+                if scoreTitle == "Correct"{
+                    Text("Your score is \(score)")
+                }else {
+                    Text("That's the flag of \(countries[tappedCountryIndex])!")
+                }
+                
             }
             .navigationTitle("FlagGame")
-//            .navigationBarTitleDisplayMode(.inline)
+            
+            .alert("Completed", isPresented: $completed) {
+                Button("Play Again", action: resetGame)
+            }message: {
+                Text("Congrats you completed the game with score of \(score) points")
+            }
+            
+            
+            //            .navigationBarTitleDisplayMode(.inline)
         }
     }
     
     func flagTapped(_ number: Int){
+        tappedCountryIndex = number
+        
         if number == correctAnswer {
             scoreTitle = "Correct"
             score += 1
         }else {
             scoreTitle = "Wrong"
         }
+        if questionCount == 7 {
+            completed = true
+            return
+        }
         showingScore = true
+        questionCount += 1
     }
     
     func askQuestion(){
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+    }
+    
+    func resetGame(){
+        scoreTitle = ""
+        showingScore = false
+        score = 0
+        tappedCountryIndex = 0
+        completed = false
+        questionCount = 0
+        countries.shuffle()
     }
 }
 
