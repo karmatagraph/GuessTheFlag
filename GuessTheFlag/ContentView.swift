@@ -7,15 +7,35 @@
 
 import SwiftUI
 
+class GlobalString: ObservableObject {
+  @Published var countries = ["Estonia","France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US" ]
+    
+}
+
+
+struct FlagImage: View {
+    //@StateObject var globalCountries = GlobalString()
+    var name: String
+    
+//    var number: Int = 0
+    var body: some View {
+        let image = Image(name)
+        return image.clipShape(Capsule())
+            .shadow(radius: 5)
+    }
+    
+}
+
+
 struct ContentView: View {
+    @StateObject var globalCountries = GlobalString()
+    
     @State private var scoreTitle = ""
     @State private var showingScore = false
     @State private var score = 0
     @State private var tappedCountryIndex = 0
     @State private var completed = false
     @State private var questionCount = 0
-    
-    @State private var countries = ["Estonia","France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US" ].shuffled()
     @State private var correctAnswer = Int.random(in: 0...2)
     
     var body: some View {
@@ -31,7 +51,7 @@ struct ContentView: View {
                         VStack{
                             Text("Tap the flag of")
                                 .font(.subheadline.weight(.semibold))
-                            Text(countries[correctAnswer])
+                            Text(globalCountries.countries[correctAnswer])
                                 .font(.largeTitle.weight(.semibold))
                         }
                         ForEach(0..<3){number in
@@ -40,9 +60,10 @@ struct ContentView: View {
                                 flagTapped(number)
                                 
                             }label: {
-                                Image(countries[number])
-                                    .clipShape(Capsule())
-                                    .shadow(radius: 5)
+                                FlagImage(name: globalCountries.countries[number])
+//                                Image(countries[number])
+//                                    .clipShape(Capsule())
+//                                    .shadow(radius: 5)
                             }
                         }
                     }
@@ -64,7 +85,7 @@ struct ContentView: View {
                 if scoreTitle == "Correct"{
                     Text("Your score is \(score)")
                 }else {
-                    Text("That's the flag of \(countries[tappedCountryIndex])!")
+                    Text("That's the flag of \(globalCountries.countries[tappedCountryIndex])!")
                 }
                 
             }
@@ -99,7 +120,7 @@ struct ContentView: View {
     }
     
     func askQuestion(){
-        countries.shuffle()
+        globalCountries.countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
     }
     
@@ -110,7 +131,7 @@ struct ContentView: View {
         tappedCountryIndex = 0
         completed = false
         questionCount = 0
-        countries.shuffle()
+        globalCountries.countries.shuffle()
     }
 }
 
